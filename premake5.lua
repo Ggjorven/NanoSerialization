@@ -39,13 +39,11 @@ MacOSVersion = "14.5"
 
 Dependencies =
 {
-	-- TODO: Library in format
-	--Library =
-	--{
-	--	LibName = "Library",
-	--	IncludeDir = "%{wks.location}/vendor/Library/Library/include",
-	--	-- Optional: LibDir  = ""
-	--}
+	TomlPlusPlus =
+	{
+		LibName = "TomlPlusPlus",
+		IncludeDir = "%{wks.location}/vendor/tomlplusplus/tomlplusplus/include",
+	}
 }
 
 ------------------------------------------------------------------------------

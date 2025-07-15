@@ -36,14 +36,11 @@ project "NanoSerialization"
 		"src",
 		"src/NanoSerialization",
 
-		-- TODO: Include dependencies
-		-- "%{Dependencies.Library.IncludeDir}",
+		"%{Dependencies.TomlPlusPlus.IncludeDir}"
 	}
 
 	links
 	{
-		-- TODO: Link libraries
-		-- "%{Dependencies.Library.LibName}",
 	}
 
 	filter "system:windows"
