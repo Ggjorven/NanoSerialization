@@ -39,16 +39,40 @@ MacOSVersion = "14.5"
 
 Dependencies =
 {
-	TomlPlusPlus =
+	RapidYAML =
 	{
-		LibName = "TomlPlusPlus",
-		IncludeDir = "%{wks.location}/vendor/tomlplusplus/tomlplusplus/include",
+		LibName = "RapidYAML",
+		IncludeDir = "%{wks.location}/vendor/rapidyaml/rapidyaml/src",
 	},
+	RapidJSON =
+	{
+		IncludeDir = "%{wks.location}/vendor/rapidjson/rapidjson/include",
+	},
+
+	C4Core = 
+	{
+		IncludeDir = "%{wks.location}/vendor/rapidyaml/rapidyaml/ext/c4core/src",
+	},
+
 	Nano =
 	{
 		IncludeDir = "%{wks.location}/vendor/Nano/Nano/Nano/include",
-	}
+	},
 }
+
+function ns_include_dependencies()
+	for name, dep in pairs(Dependencies) do
+		if dep.IncludeDir then
+			includedirs { dep.IncludeDir }
+		end
+		if dep.LibDir then
+			libdirs { dep.LibDir }
+		end
+		if dep.LibName then
+			links { dep.LibName }
+		end
+	end
+end
 
 ------------------------------------------------------------------------------
 -- Solution
@@ -72,7 +96,7 @@ workspace "NanoSerialization"
 	}
 
 group "Dependencies"
-	-- include "vendor/Library"
+	include "vendor/rapidyaml"
 group ""
 
 group "NanoSerialization"

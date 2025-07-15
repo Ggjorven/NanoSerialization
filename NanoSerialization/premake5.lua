@@ -35,14 +35,9 @@ project "NanoSerialization"
 	{
 		"src",
 		"src/NanoSerialization",
-
-		"%{Dependencies.TomlPlusPlus.IncludeDir}",
-		"%{Dependencies.Nano.IncludeDir}",
 	}
 
-	links
-	{
-	}
+	ns_include_dependencies()
 
 	filter "system:windows"
 		defines "NS_PLATFORM_DESKTOP"

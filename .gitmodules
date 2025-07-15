@@ -1,3 +1,9 @@
 [submodule "vendor/Nano/Nano"]
 	path = vendor/Nano/Nano
 	url = https://github.com/Ggjorven/Nano.git
+[submodule "vendor/rapidyaml/rapidyaml"]
+	path = vendor/rapidyaml/rapidyaml
+	url = https://github.com/biojppm/rapidyaml.git
+[submodule "vendor/rapidjson/rapidjson"]
+	path = vendor/rapidjson/rapidjson
+	url = https://github.com/Tencent/rapidjson

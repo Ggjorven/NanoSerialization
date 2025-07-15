@@ -32,17 +32,16 @@ project "Sandbox"
 	includedirs
 	{
 		"src",
-
+		
 		"%{wks.location}/NanoSerialization/src",
-
-		"%{Dependencies.TomlPlusPlus.IncludeDir}",
-		"%{Dependencies.Nano.IncludeDir}",
 	}
 
 	links
 	{
 		"NanoSerialization",
 	}
+
+	ns_include_dependencies()
 
 	filter "system:windows"
 		defines "NS_PLATFORM_DESKTOP"

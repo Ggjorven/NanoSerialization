@@ -1,10 +1,6 @@
 # NanoSerialization
 
-// TODO: Replace NanoSerialization with your project name in all files (Ctrl + H)
-// TODO: Replace NS with your project abbreviation in all files (Ctrl + H)
-// TODO: Replace ns with your project lowercase abbreviation in all files (Ctrl + H)
-
-// TODO: Small summary
+// TODO: ...
 
 ## Features
 
