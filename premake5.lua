@@ -43,6 +43,10 @@ Dependencies =
 	{
 		LibName = "TomlPlusPlus",
 		IncludeDir = "%{wks.location}/vendor/tomlplusplus/tomlplusplus/include",
+	},
+	Nano =
+	{
+		IncludeDir = "%{wks.location}/vendor/Nano/Nano/Nano/include",
 	}
 }
 

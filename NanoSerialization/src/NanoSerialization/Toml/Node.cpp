@@ -1,6 +1,8 @@
 #include "nspch.h"
 #include "Node.hpp"
 
+#include "NanoSerialization/Core/Core.hpp"
+
 namespace Nano::Serialization::Toml
 {
 
@@ -41,6 +43,34 @@ namespace Nano::Serialization::Toml
 	Node Node::operator [] (std::string_view input) const
 	{
 		return At(input);
+	}
+
+	Node Node::operator << (NodeType type)
+	{
+		m_LatestType = type;
+		return *this;
+	}
+
+	Node Node::operator << (std::string_view value)
+	{
+		if (m_LatestType == NodeType::Value)
+			return this->template operator << <std::string_view> (value);
+
+		if (m_LatestType == NodeType::Key)
+		{
+
+		}
+		else if (m_LatestType == NodeType::BeginList)
+		{
+
+		}
+		else if (m_LatestType == NodeType::BeginTable)
+		{
+
+		}
+
+		NS_UNREACHABLE();
+		return *this;
 	}
 
 }

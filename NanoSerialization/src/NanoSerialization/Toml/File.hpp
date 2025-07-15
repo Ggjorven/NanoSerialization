@@ -28,6 +28,9 @@ namespace Nano::Serialization::Toml
 
 	private:
 		toml::table m_TomlTable;
+
+		template<typename T>
+		friend struct Serializer;
 	};
 
 }

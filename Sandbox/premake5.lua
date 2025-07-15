@@ -35,7 +35,8 @@ project "Sandbox"
 
 		"%{wks.location}/NanoSerialization/src",
 
-		"%{Dependencies.TomlPlusPlus.IncludeDir}"
+		"%{Dependencies.TomlPlusPlus.IncludeDir}",
+		"%{Dependencies.Nano.IncludeDir}",
 	}
 
 	links

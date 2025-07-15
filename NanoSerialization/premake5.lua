@@ -36,7 +36,8 @@ project "NanoSerialization"
 		"src",
 		"src/NanoSerialization",
 
-		"%{Dependencies.TomlPlusPlus.IncludeDir}"
+		"%{Dependencies.TomlPlusPlus.IncludeDir}",
+		"%{Dependencies.Nano.IncludeDir}",
 	}
 
 	links

@@ -1,3 +1,6 @@
 [submodule "vendor/tomlplusplus/tomlplusplus"]
 	path = vendor/tomlplusplus/tomlplusplus
 	url = https://github.com/marzer/tomlplusplus.git
+[submodule "vendor/Nano/Nano"]
+	path = vendor/Nano/Nano
+	url = https://github.com/Ggjorven/Nano.git
