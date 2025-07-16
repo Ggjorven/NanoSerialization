@@ -1,7 +1,7 @@
 #include "nspch.h"
 #include "File.hpp"
 
-namespace Nano::Serialization::Yaml
+namespace Nano::Serialization::Json
 {
 
 	////////////////////////////////////////////////////////////////////////////////////
