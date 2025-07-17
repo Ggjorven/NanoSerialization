@@ -22,11 +22,8 @@ namespace Nano::Serialization::Yaml
 		Key, 
 		Value, 
 
-		BeginList, 
-		EndList, 
-
-		BeginTable,
-		EndTable
+		Sequence, 
+		Map
 	};
 
 	////////////////////////////////////////////////////////////////////////////////////
@@ -37,12 +34,21 @@ namespace Nano::Serialization::Yaml
 	public:
 		// Constructors & Destructor
 		Node(const ryml::NodeRef& node);
+		Node(const ryml::NodeRef& node, NodeType type);
 		~Node() = default;
 	
 		// Methods
 
 		// Operators
 		Node operator [] (std::string_view key);
+
+		Node operator << (NodeType type);
+		Node operator << (const char* key);
+		Node operator << (std::string_view key);
+		Node operator << (const std::string& key);
+
+		template<typename T>
+		Node operator << (const T& value);
 
 		// Extraction
 		template<typename T>
@@ -57,6 +63,9 @@ namespace Nano::Serialization::Yaml
 	protected:
 		ryml::NodeRef m_Node;
 
+		// Insertion // Note: Used for operator << string_view etc, to be able to use those as a value too.
+		NodeType m_LatestType = NodeType::None;
+
 		template<typename T>
 		friend struct Serializer;
 	};
@@ -64,20 +73,20 @@ namespace Nano::Serialization::Yaml
 	////////////////////////////////////////////////////////////////////////////////////
 	// Custom type serializer
 	////////////////////////////////////////////////////////////////////////////////////
+	// Note: Only implements default types: integers, floats 
 	template<typename T>
 	struct Serializer
 	{
 	public:
-		inline static Node Serialize(Node& node, std::string_view key, const T& value)
+		inline static void Serialize(Node& node, const T& value) requires(
+			std::is_integral_v<std::decay_t<T>> ||
+			std::is_floating_point_v<std::decay_t<T>>
+		)
 		{
-			// TODO: ...
-
-			return node[key];
+			node.m_Node << value;
 		}
 
-		// Note: Only implements default types: bool, integers, floats 
 		inline static std::optional<T> Deserialize(const Node& node) requires(
-			std::is_same_v<std::decay_t<T>, bool> ||
 			std::is_integral_v<std::decay_t<T>> ||
 			std::is_floating_point_v<std::decay_t<T>>
 		)
@@ -91,20 +100,38 @@ namespace Nano::Serialization::Yaml
 		}
 	};
 
-	// Note: This is here instead of in StdSerializers.hpp since it is kind of a default type in
-	// yaml. 
+	template<>
+	struct Serializer<bool>
+	{
+	public:
+		inline static void Serialize(Node& node, bool value)
+		{
+			std::stringstream ss;
+			ss << std::boolalpha << value;
+
+			node.m_Node << ss.str().c_str();
+		}
+
+		inline static std::optional<bool> Deserialize(const Node& node)
+		{
+			if (!node.HasValue())
+				return {};
+
+			bool out;
+			node.m_Node >> out;
+			return out;
+		}
+	};
+
 	template<>
 	struct Serializer<std::string>
 	{
 	public:
-		inline static Node Serialize(Node& node, std::string_view key, const std::string& value)
+		inline static void Serialize(Node& node, const std::string& value)
 		{
-			// TODO: ...
-
-			return node[key];
+			node.m_Node << value.c_str();
 		}
 
-		// Note: Only implements default types: bool, integers, floats, strings
 		inline static std::optional<std::string> Deserialize(const Node& node) 
 		{
 			if (!node.HasValue())
@@ -113,6 +140,16 @@ namespace Nano::Serialization::Yaml
 			return std::string(node.m_Node.val().data(), node.m_Node.val().size());
 		}
 	};
+
+	////////////////////////////////////////////////////////////////////////////////////
+	// Operators
+	////////////////////////////////////////////////////////////////////////////////////
+	template<typename T>
+	Node Node::operator << (const T& value)
+	{
+		Serializer<T>::Serialize(*this, value);
+		return *this;
+	}
 
 	////////////////////////////////////////////////////////////////////////////////////
 	// Extraction

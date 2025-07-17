@@ -15,6 +15,7 @@ namespace Nano::Serialization::Yaml
 	{
 		// Note: Reinit so it actually points to the new empty tree
 		m_Node = m_Tree.rootref();
+		m_Node |= ryml::NodeType_e::MAP;
 	}
 
 	File::File(const std::filesystem::path& path)

@@ -14,6 +14,11 @@ namespace Nano::Serialization::Yaml
 	{
 	}
 
+	Node::Node(const ryml::NodeRef& node, NodeType type)
+		: m_Node(node), m_LatestType(type)
+	{
+	}
+
 	////////////////////////////////////////////////////////////////////////////////////
 	// Methods
 	////////////////////////////////////////////////////////////////////////////////////
@@ -24,6 +29,78 @@ namespace Nano::Serialization::Yaml
 	Node Node::operator [] (std::string_view key)
 	{
 		return Node(m_Node.at(ryml::to_csubstr(key.data())));
+	}
+
+	Node Node::operator << (NodeType type)
+	{
+		m_LatestType = type;
+
+		switch (type)
+		{
+		case NodeType::Key:
+		{
+			Node newNode = Node(m_Node.append_child());
+			//newNode.m_Node |= ryml::KEY;
+			return newNode;
+		}
+		case NodeType::Value:
+		{
+			if ((m_Node.get()->m_type & ryml::KEY) && !(m_Node.get()->m_type & ryml::MAP) && !(m_Node.get()->m_type & ryml::SEQ))
+			{
+				m_Node |= ryml::VAL;
+				return *this;
+			}
+			else
+			{
+				Node newNode = Node(m_Node.append_child(), NodeType::Value);
+				//newNode.m_Node |= ryml::VAL;
+				return newNode;
+			}
+		}
+
+		case NodeType::Sequence:
+		{
+			Node newNode = Node(m_Node.append_child());
+			newNode.m_Node |= ryml::SEQ;
+			return newNode;
+		}
+
+		case NodeType::Map:
+		{
+			Node newNode = Node(m_Node.append_child());
+			newNode.m_Node |= ryml::MAP;
+			return newNode;
+		}
+
+		default:
+			NS_UNREACHABLE();
+			break;
+		}
+
+		return *this;
+	}
+
+	Node Node::operator << (const char* key)
+	{
+		return this->operator << (std::string_view(key));
+	}
+
+	Node Node::operator << (std::string_view key)
+	{
+		if (m_LatestType == NodeType::Value)
+			return this->template operator << <std::string> (std::string(key));
+
+		std::string keyStr = std::string(key);
+		auto rymlKey = ryml::key(keyStr);
+
+		m_Node << rymlKey;
+
+		return *this;
+	}
+
+	Node Node::operator << (const std::string& key)
+	{
+		return this->operator << (std::string_view(key));
 	}
 
 }
