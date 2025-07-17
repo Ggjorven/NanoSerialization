@@ -68,12 +68,16 @@ function ns_include_dependencies()
 		if dep.LibDir then
 			libdirs { dep.LibDir }
 		end
+	end
+end
+
+function ns_link_dependencies()
+	for name, dep in pairs(Dependencies) do
 		if dep.LibName then
 			links { dep.LibName }
 		end
 	end
 end
-
 ------------------------------------------------------------------------------
 -- Solution
 ------------------------------------------------------------------------------

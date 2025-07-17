@@ -16,22 +16,35 @@ project "RapidYAML"
 		"rapidyaml/src/**.hpp",
 		"rapidyaml/src/**.cpp",
 
-		"rapidyaml/ext/c4core/src/**.h",
-		"rapidyaml/ext/c4core/src/**.hpp",
-		"rapidyaml/ext/c4core/src/**.cpp",
+		"rapidyaml/ext/c4core/src/c4/**.h",
+		"rapidyaml/ext/c4core/src/c4/**.hpp",
+		"rapidyaml/ext/c4core/src/c4/**.cpp",
+	}
+
+	removefiles 
+	{
+		"rapidyaml/ext/c4core/src/c4/ext/**.h",
+		"rapidyaml/ext/c4core/src/c4/ext/**.hpp",
+		"rapidyaml/ext/c4core/src/c4/ext/**.cpp",
+	}
+
+	files
+	{
+		"rapidyaml/ext/c4core/src/c4/ext/fast_float/include/**.h",
+		"rapidyaml/ext/c4core/src/c4/ext/fast_float/include/**.hpp",
+		"rapidyaml/ext/c4core/src/c4/ext/fast_float/include/**.cpp",
 	}
 
 	includedirs
     {
         "rapidyaml/src",
         "rapidyaml/ext/c4core/src",
+		"rapidyaml/ext/c4core/src/c4/ext/fast_float/include",
     }
 
 	defines
 	{
 		"_CRT_SECURE_NO_WARNINGS",
-
-		"C4_NO_DEBUG_BREAK"
 	}
 
 	filter "system:windows"

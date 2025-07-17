@@ -1,8 +1,16 @@
 #pragma once
 
-#define C4_NO_DEBUG_BREAK
+// Rapid YAML
 #include <ryml.hpp>
 
+// C4
+#include <c4/charconv.hpp>
+#include <c4/std/string.hpp>
+#include <c4/std/string_fwd.hpp>
+
+#include <c4/yml/tree.hpp>
+
+// STL
 #include <optional>
 
 namespace Nano::Serialization::Yaml

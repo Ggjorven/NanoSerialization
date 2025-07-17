@@ -38,6 +38,7 @@ project "NanoSerialization"
 	}
 
 	ns_include_dependencies()
+	ns_link_dependencies()
 
 	filter "system:windows"
 		defines "NS_PLATFORM_DESKTOP"

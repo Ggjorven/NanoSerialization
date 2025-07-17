@@ -12,7 +12,7 @@ namespace Nano::Serialization::Yaml
 	////////////////////////////////////////////////////////////////////////////////////
 	// File
 	////////////////////////////////////////////////////////////////////////////////////
-	class File : public Node // Note: A yaml file doesn't exclusively mean a filesystem file, it just means a collection of TOML data
+	class File : public Node // Note: A yaml file doesn't exclusively mean a filesystem file, it just means a collection of YAML data
 	{
 	public:
 		// Constructors & Destructor
@@ -27,6 +27,13 @@ namespace Nano::Serialization::Yaml
 		std::string AsString() const;
 
 	private:
+		// Input
+		std::string m_Source;
+
+		// Output
+
+		// All
+		ryml::Tree m_Tree;
 	};
 
 }
