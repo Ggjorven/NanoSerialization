@@ -14,11 +14,6 @@ namespace Nano::Serialization::Yaml
 	{
 	}
 
-	Node::Node(const ryml::NodeRef& node, NodeType type)
-		: m_Node(node), m_LatestType(type)
-	{
-	}
-
 	////////////////////////////////////////////////////////////////////////////////////
 	// Methods
 	////////////////////////////////////////////////////////////////////////////////////
@@ -26,21 +21,29 @@ namespace Nano::Serialization::Yaml
 	////////////////////////////////////////////////////////////////////////////////////
 	// Operators
 	////////////////////////////////////////////////////////////////////////////////////
+	Node Node::operator [] (const char* key)
+	{
+		return this->operator [] (std::string_view(key));
+	}
+
 	Node Node::operator [] (std::string_view key)
 	{
 		return Node(m_Node.at(ryml::to_csubstr(key.data())));
 	}
 
+	Node Node::operator[](const std::string& key)
+	{
+		return this->operator [] (std::string_view(key));
+	}
+
 	Node Node::operator << (NodeType type)
 	{
-		m_LatestType = type;
-
 		switch (type)
 		{
 		case NodeType::Key:
 		{
 			Node newNode = Node(m_Node.append_child());
-			//newNode.m_Node |= ryml::KEY;
+			newNode.m_Node |= ryml::KEY;
 			return newNode;
 		}
 		case NodeType::Value:
@@ -52,8 +55,8 @@ namespace Nano::Serialization::Yaml
 			}
 			else
 			{
-				Node newNode = Node(m_Node.append_child(), NodeType::Value);
-				//newNode.m_Node |= ryml::VAL;
+				Node newNode = Node(m_Node.append_child());
+				newNode.m_Node |= ryml::VAL;
 				return newNode;
 			}
 		}
@@ -82,25 +85,23 @@ namespace Nano::Serialization::Yaml
 
 	Node Node::operator << (const char* key)
 	{
-		return this->operator << (std::string_view(key));
+		return this->operator << (std::string(key));
 	}
 
 	Node Node::operator << (std::string_view key)
 	{
-		if (m_LatestType == NodeType::Value)
-			return this->template operator << <std::string> (std::string(key));
-
-		std::string keyStr = std::string(key);
-		auto rymlKey = ryml::key(keyStr);
-
-		m_Node << rymlKey;
-
-		return *this;
+		return this->operator << (std::string(key));
 	}
 
 	Node Node::operator << (const std::string& key)
 	{
-		return this->operator << (std::string_view(key));
+		if ((m_Node.get()->m_type & ryml::VAL))
+			return this->template operator << <std::string> (std::string(key));
+
+		auto rymlKey = ryml::key(key);
+		m_Node << rymlKey;
+
+		return *this;
 	}
 
 }

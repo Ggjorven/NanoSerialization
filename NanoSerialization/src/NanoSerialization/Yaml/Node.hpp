@@ -34,13 +34,14 @@ namespace Nano::Serialization::Yaml
 	public:
 		// Constructors & Destructor
 		Node(const ryml::NodeRef& node);
-		Node(const ryml::NodeRef& node, NodeType type);
 		~Node() = default;
 	
 		// Methods
 
 		// Operators
+		Node operator [] (const char* key);
 		Node operator [] (std::string_view key);
+		Node operator [] (const std::string& key);
 
 		Node operator << (NodeType type);
 		Node operator << (const char* key);
@@ -58,13 +59,11 @@ namespace Nano::Serialization::Yaml
 		inline bool HasValue() const { return m_Node.has_val(); }
 		inline bool HasChild(std::string_view child) const { return m_Node.has_child(ryml::to_csubstr(child.data())); }
 
-		// TODO: Children iterators
+		// Iterators
+		// TODO: ...
 
 	protected:
 		ryml::NodeRef m_Node;
-
-		// Insertion // Note: Used for operator << string_view etc, to be able to use those as a value too.
-		NodeType m_LatestType = NodeType::None;
 
 		template<typename T>
 		friend struct Serializer;
