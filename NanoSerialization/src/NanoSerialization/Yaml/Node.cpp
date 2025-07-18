@@ -52,6 +52,16 @@ namespace Nano::Serialization::Yaml
 		return Node(m_Node.parent());
 	}
 
+	Node Node::AddChild()
+	{
+		return Node(m_Node.append_child());
+	}
+
+	void Node::RemoveChild(const Node& node)
+	{
+		m_Node.remove_child(node.m_Node);
+	}
+
 	////////////////////////////////////////////////////////////////////////////////////
 	// Operators
 	////////////////////////////////////////////////////////////////////////////////////
@@ -76,7 +86,7 @@ namespace Nano::Serialization::Yaml
 		{
 		case NodeType::Key:
 		{
-			Node newNode = Node(m_Node.append_child());
+			Node newNode = AddChild();
 			newNode.m_Node |= ryml::KEY;
 			return newNode;
 		}
@@ -87,24 +97,22 @@ namespace Nano::Serialization::Yaml
 				m_Node |= ryml::VAL;
 				return *this;
 			}
-			else
-			{
-				Node newNode = Node(m_Node.append_child());
-				newNode.m_Node |= ryml::VAL;
-				return newNode;
-			}
+
+			Node newNode = AddChild();
+			newNode.m_Node |= ryml::VAL;
+			return newNode;
 		}
 
 		case NodeType::Sequence:
 		{
-			Node newNode = Node(m_Node.append_child());
+			Node newNode = AddChild();
 			newNode.m_Node |= ryml::SEQ;
 			return newNode;
 		}
 
 		case NodeType::Map:
 		{
-			Node newNode = Node(m_Node.append_child());
+			Node newNode = AddChild();
 			newNode.m_Node |= ryml::MAP;
 			return newNode;
 		}
@@ -151,12 +159,12 @@ namespace Nano::Serialization::Yaml
 		return ChildIterator(m_Node, ryml::NONE);
 	}
 
-	const Node::ChildIterator Node::cbegin() const
+	const Node::ChildIterator Node::begin() const
 	{
-		return ChildIterator(m_Node, m_Node.last_child().id());
+		return ChildIterator(m_Node, m_Node.first_child().id());
 	}
 
-	const Node::ChildIterator Node::cend() const
+	const Node::ChildIterator Node::end() const
 	{
 		return ChildIterator(m_Node, ryml::NONE);
 	}

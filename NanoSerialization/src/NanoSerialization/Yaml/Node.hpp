@@ -71,6 +71,9 @@ namespace Nano::Serialization::Yaml
 		// Methods
 		Node Parent();
 
+		Node AddChild();
+		void RemoveChild(const Node& node);
+
 		// Operators
 		const Node operator [] (const char* key) const;
 		const Node operator [] (std::string_view key) const;
@@ -91,14 +94,28 @@ namespace Nano::Serialization::Yaml
 		// Helpers
 		inline bool HasValue() const { return m_Node.has_val(); }
 		inline bool HasChild(std::string_view child) const { return m_Node.has_child(ryml::to_csubstr(child.data())); }
+		inline bool HasChildren() const { return m_Node.has_children(); }
 
 		inline size_t NumOfChildren() const { return m_Node.num_children(); }
+
+		// Note: Makes it a single line sequence, this removes all child objects. Useful for arrays and other combined objects.
+		inline void MakeSingleLine() 
+		{ 
+			//m_Node.clear();
+			//auto t = m_Node.type();
+			//m_Node.set_type(ryml::FLOW_SL | ryml::SEQ);
+			//m_Node |= (ryml::FLOW_SL | ryml::SEQ); 
+			//auto t2 = m_Node.type();
+			
+			m_Node |= (ryml::FLOW_SL); 
+			m_Node.clear_children();
+		}
 
 		// Iterators
 		ChildIterator begin();
 		ChildIterator end();
-		const ChildIterator cbegin() const;
-		const ChildIterator cend() const;
+		const ChildIterator begin() const;
+		const ChildIterator end() const;
 
 	protected:
 		mutable ryml::NodeRef m_Node;
@@ -175,44 +192,6 @@ namespace Nano::Serialization::Yaml
 				return {};
 
 			return std::string(node.m_Node.val().data(), node.m_Node.val().size());
-		}
-	};
-
-	template<typename T>
-	struct Serializer<std::vector<T>>
-	{
-	public:
-		inline static void Serialize(Node& node, const std::vector<T>& value)
-		{
-			auto sequence = node.Parent();
-
-			sequence.m_Node |= ryml::FLOW_SL;
-
-			// Hacky way // FUTURE TODO: ...
-			sequence.m_Node.remove_child(node.m_Node);
-
-			for (const auto& val : value)
-			{
-				Node arrayElementNode = Node(sequence.m_Node.append_child());
-				Serializer<T>::Serialize(arrayElementNode, val);
-			}
-		}
-
-		inline static std::optional<std::vector<T>> Deserialize(const Node& node)
-		{
-			if (!node.m_Node.has_children())
-				return {};
-
-			std::vector<T> vec;
-			vec.reserve(node.m_Node.num_children());
-
-			for (const auto& child : node.m_Node.children())
-			{
-				Node childNode = Node(child);
-				vec.emplace_back(Serializer<T>::Deserialize(childNode).value());
-			}
-
-			return vec;
 		}
 	};
 

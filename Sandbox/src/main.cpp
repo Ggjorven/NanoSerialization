@@ -8,6 +8,74 @@
 
 using namespace Nano::Serialization;
 
+template<typename T, size_t N>
+struct Nano::Serialization::Yaml::Serializer<std::array<T, N>>
+{
+public:
+    inline static void Serialize(Node& node, const std::array<T, N>& value) 
+    {
+        auto sequence = node.Parent();
+        //auto sequence = node;
+
+        sequence.MakeSingleLine();
+
+        for (const auto& val : value)
+        {
+            Node arrayElementNode = sequence.AddChild();
+            Serializer<T>::Serialize(arrayElementNode, val);
+        }
+    }
+
+    inline static std::optional<std::array<T, N>> Deserialize(const Node& node)
+    {
+        if (!node.HasChildren())
+            return {};
+
+        std::array<T, N> arr;
+
+        size_t i = 0;
+        for (const Node& child : node)
+            arr[i++] = Serializer<T>::Deserialize(child).value();
+
+        return arr;
+    }
+};
+
+template<typename T>
+struct Nano::Serialization::Yaml::Serializer<std::vector<T>>
+{
+public:
+    inline static void Serialize(Node& node, const std::vector<T>& value)
+    {
+        auto sequence = node.Parent();
+        //auto sequence = node;
+
+        auto t = sequence.m_Node.type();
+
+        sequence.MakeSingleLine();
+
+        for (const auto& val : value)
+        {
+            Node arrayElementNode = sequence.AddChild();
+            Serializer<T>::Serialize(arrayElementNode, val);
+        }
+    }
+
+    inline static std::optional<std::vector<T>> Deserialize(const Node& node)
+    {
+        if (!node.HasChildren())
+            return {};
+
+        std::vector<T> vec;
+        vec.reserve(node.NumOfChildren());
+
+        for (const Node& child : node)
+            vec.emplace_back(Serializer<T>::Deserialize(child).value());
+
+        return vec;
+    }
+};
+
 int main(int argc, char* argv[])
 {
     (void)argc; (void)argv;
@@ -90,7 +158,8 @@ int main(int argc, char* argv[])
         auto posSeq = transform << Yaml::NodeType::Sequence << "Position";
         posSeq << Yaml::NodeType::Value << std::vector({ 1, 2, 3, 4, 5, 6, 7 });
 
-        transform << Yaml::NodeType::Key << "Size" << Yaml::NodeType::Value << "[1, 2, 1]";
+        auto sizeSeq = transform << Yaml::NodeType::Sequence << "Size";
+        sizeSeq << Yaml::NodeType::Value << std::to_array({ 8, 9, 10, 11, 12, 13, 14 });
         transform << Yaml::NodeType::Key << "Rotation" << Yaml::NodeType::Value << "[1, 3, 1]";
 
         auto e2Map = entities << Yaml::NodeType::Map;
@@ -114,6 +183,11 @@ int main(int argc, char* argv[])
         for (const auto& i : posSeq.As<std::vector<int>>().value())
         {
             std::cout << "int: " << i << '\n';
+        }
+
+        for (const auto& i : sizeSeq.As<std::array<int, 7>>().value())
+        {
+            std::cout << "int 2: " << i << '\n';
         }
 
         for (const auto& entity : entities)
