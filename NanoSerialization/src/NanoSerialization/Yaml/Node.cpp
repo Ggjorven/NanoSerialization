@@ -7,6 +7,36 @@ namespace Nano::Serialization::Yaml
 {
 
 	////////////////////////////////////////////////////////////////////////////////////
+	// Constructor & Destructor
+	////////////////////////////////////////////////////////////////////////////////////
+	Node::ChildIterator::ChildIterator(ryml::NodeRef base, ryml::id_type current)
+		: m_BaseNode(base), m_CurrentID(current)
+	{
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////
+	// Iterators
+	////////////////////////////////////////////////////////////////////////////////////
+	const Node::ChildIterator& Node::ChildIterator::operator ++ () const
+	{
+		m_CurrentID = m_BaseNode.tree()->next_sibling(m_CurrentID);
+		return *this;
+	}
+
+	void Node::ChildIterator::operator ++ (int) const
+	{
+		++(*this);
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////
+	// Operators
+	////////////////////////////////////////////////////////////////////////////////////
+	Node Node::ChildIterator::operator * () const
+	{
+		return Node(ryml::NodeRef(m_BaseNode.tree(), m_CurrentID));
+	}
+	
+	////////////////////////////////////////////////////////////////////////////////////
 	// Constructors & Destructor
 	////////////////////////////////////////////////////////////////////////////////////
 	Node::Node(const ryml::NodeRef& node)
@@ -17,21 +47,25 @@ namespace Nano::Serialization::Yaml
 	////////////////////////////////////////////////////////////////////////////////////
 	// Methods
 	////////////////////////////////////////////////////////////////////////////////////
+	Node Node::Parent()
+	{
+		return Node(m_Node.parent());
+	}
 
 	////////////////////////////////////////////////////////////////////////////////////
 	// Operators
 	////////////////////////////////////////////////////////////////////////////////////
-	Node Node::operator [] (const char* key)
+	const Node Node::operator [] (const char* key) const
 	{
 		return this->operator [] (std::string_view(key));
 	}
 
-	Node Node::operator [] (std::string_view key)
+	const Node Node::operator [] (std::string_view key) const
 	{
 		return Node(m_Node.at(ryml::to_csubstr(key.data())));
 	}
 
-	Node Node::operator[](const std::string& key)
+	const Node Node::operator[](const std::string& key) const
 	{
 		return this->operator [] (std::string_view(key));
 	}
@@ -102,6 +136,29 @@ namespace Nano::Serialization::Yaml
 		m_Node << rymlKey;
 
 		return *this;
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////
+	// Iterators
+	////////////////////////////////////////////////////////////////////////////////////
+	Node::ChildIterator Node::begin()
+	{
+		return ChildIterator(m_Node, m_Node.first_child().id());
+	}
+
+	Node::ChildIterator Node::end()
+	{
+		return ChildIterator(m_Node, ryml::NONE);
+	}
+
+	const Node::ChildIterator Node::cbegin() const
+	{
+		return ChildIterator(m_Node, m_Node.last_child().id());
+	}
+
+	const Node::ChildIterator Node::cend() const
+	{
+		return ChildIterator(m_Node, ryml::NONE);
 	}
 
 }

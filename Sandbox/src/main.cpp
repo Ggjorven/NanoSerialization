@@ -8,12 +8,11 @@
 
 using namespace Nano::Serialization;
 
-using namespace std::literals;
-
 int main(int argc, char* argv[])
 {
     (void)argc; (void)argv;
 
+    if (false)
     {
         ryml::Tree tree;
         auto root = tree.rootref();
@@ -29,6 +28,15 @@ int main(int argc, char* argv[])
 
         address.append_child() << ryml::key("city") << "New York";
         address.append_child() << ryml::key("zip") << "10001";
+
+        ryml::NodeRef transform = root.append_child();
+        transform << ryml::key("transform");
+        transform |= ryml::NodeType_e::SEQ;
+        transform |= ryml::NodeType_e::FLOW_SL;
+
+        transform.append_child() << "1";
+        transform.append_child() << "1";
+        transform.append_child() << "1";
 
         ryml::NodeRef list = root.append_child();
         list << ryml::key("list");
@@ -52,13 +60,12 @@ int main(int argc, char* argv[])
 
         e2.append_child() << ryml::key("E2") << "2";
 
-        
         std::string out_yaml;
         ryml::emitrs_yaml<std::string>(&tree, &out_yaml);
 
         std::cout << "--- Serialized YAML ---\n" << out_yaml;
     }
-
+    
     {
         Yaml::File file;
 
@@ -76,14 +83,43 @@ int main(int argc, char* argv[])
         map << Yaml::NodeType::Key << "Key2" << Yaml::NodeType::Value << "Val2";
 
         auto entities = file << Yaml::NodeType::Sequence << "Entities";
-        auto eMap = entities << Yaml::NodeType::Map;
-        auto e1 = eMap << Yaml::NodeType::Key << "E1" << Yaml::NodeType::Value << "02149028149";
-        auto transform = eMap << Yaml::NodeType::Map << "Transform"; 
-        transform << Yaml::NodeType::Key << "Position" << Yaml::NodeType::Value << "[1, 1, 1]";
+        auto e1Map = entities << Yaml::NodeType::Map;
+        auto e1 = e1Map << Yaml::NodeType::Key << "Entity" << Yaml::NodeType::Value << 2149028149;
+        auto transform = e1Map << Yaml::NodeType::Map << "Transform"; 
+
+        auto posSeq = transform << Yaml::NodeType::Sequence << "Position";
+        posSeq << Yaml::NodeType::Value << std::vector({ 1, 2, 3, 4, 5, 6, 7 });
+
         transform << Yaml::NodeType::Key << "Size" << Yaml::NodeType::Value << "[1, 2, 1]";
         transform << Yaml::NodeType::Key << "Rotation" << Yaml::NodeType::Value << "[1, 3, 1]";
 
+        auto e2Map = entities << Yaml::NodeType::Map;
+        auto e2 = e2Map << Yaml::NodeType::Key << "Entity" << Yaml::NodeType::Value << 93842098321;
+        auto transform2 = e2Map << Yaml::NodeType::Map << "Transform";
+        transform2 << Yaml::NodeType::Key << "Position" << Yaml::NodeType::Value << "[2, 1, 1]";
+        transform2 << Yaml::NodeType::Key << "Size" << Yaml::NodeType::Value << "[2, 2, 1]";
+        transform2 << Yaml::NodeType::Key << "Rotation" << Yaml::NodeType::Value << "[2, 3, 1]";
+
+        auto e3Map = entities << Yaml::NodeType::Map;
+        auto e3 = e3Map << Yaml::NodeType::Key << "Entity" << Yaml::NodeType::Value << 32094870923;
+        auto transform3 = e3Map << Yaml::NodeType::Map << "Transform";
+        transform3 << Yaml::NodeType::Key << "Position" << Yaml::NodeType::Value << "[2, 1, 1]";
+        transform3 << Yaml::NodeType::Key << "Size" << Yaml::NodeType::Value << "[2, 2, 1]";
+        transform3 << Yaml::NodeType::Key << "Rotation" << Yaml::NodeType::Value << "[2, 3, 1]";
+
         std::cout << "--- Serialized YAML ---\n" << file.AsString();
+
+        std::cout << "\n";
+
+        for (const auto& i : posSeq.As<std::vector<int>>().value())
+        {
+            std::cout << "int: " << i << '\n';
+        }
+
+        for (const auto& entity : entities)
+        {
+            std::cout << "Entity ID: " << entity["Entity"].As<uint64_t>().value() << '\n';
+        }
     }
 
     return 0;
